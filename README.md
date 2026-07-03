@@ -1,3 +1,3 @@
-# Raman-Maps-Analyzer---Parmenio-Camus
+# POEMAS-Raman-Maps-Analyzer
 Fitting and representation of Raman, PL and TERS maps.
 Coded by Parmenio Boronat and Víctor Camús.
