@@ -33,7 +33,7 @@ def find_nearest(array, values):
 
     return idx if len(idx) > 1 else idx[0]
 
-C = 1239.84197          # Planck constant × c (eV·nm)
+HC = 1239.84197          # Planck constant × c (eV·nm)
 HC_CM = 1e7 / HC         # 8065.54429 cm⁻¹/eV
 
 def nm_to_raman(lambda_nm, laser_nm): # Convert wavelength (nm) to Raman shift (cm⁻¹).
