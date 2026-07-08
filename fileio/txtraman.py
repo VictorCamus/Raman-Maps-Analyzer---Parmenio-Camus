@@ -41,4 +41,3 @@ def load(file_list):
             xdata['1/cm'] = q
 
     return xdata, spectra, mida, dims, laser, units
-    

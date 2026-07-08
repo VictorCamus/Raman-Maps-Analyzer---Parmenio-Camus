@@ -49,7 +49,7 @@ def raman_to_nm(shift_cm1, laser_nm): # Convert Raman shift (cm⁻¹) to wavelen
 
 def raman_to_eV(shift_cm1, laser_nm): # Convert Raman shift (cm⁻¹) to energy (eV).
     shift_cm1 = np.asarray(shift_cm1)
-    return HC / laser_nm + shift_cm1 / HC_CM
+    return HC / laser_nm - shift_cm1 / HC_CM
 
 def eV_to_nm(energy_eV): # Convert energy (eV) to wavelength (nm).
     return HC / np.asarray(energy_eV)
