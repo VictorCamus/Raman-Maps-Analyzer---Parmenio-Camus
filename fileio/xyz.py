@@ -13,13 +13,14 @@ def load(file_list):
         Ny = sum(x == x[0]); Nx = len(x) // Ny
 
         shiftX = abs(x[1] - x[0]) * 1e6; shiftY = abs(y[Nx] - y[0]) * 1e6
-        midaX = round(Nx * shiftX, 3); midaY = round(Ny * shiftY, 3)
+        mida = round(Nx * shiftX, 3), round(Ny * shiftY, 3)
 
         Z = np.flipud(z.reshape(Ny, Nx))
+        N = Nx, Ny
 
         lims_file = file.with_name(f'{tipus} - lims.txt')
         lims = np.loadtxt(lims_file) if lims_file.exists() else None
 
         channels[tipus] = ChannelData(tipus=tipus, name=tipus, Z=Z, lims=lims, mult=True)
 
-    return channels, [Nx, Ny], (midaX, midaY)
+    return channels, N, mida

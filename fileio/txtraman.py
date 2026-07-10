@@ -1,5 +1,6 @@
 from numpy import genfromtxt, unique
 from process.basics import raman_to_nm, raman_to_eV, nm_to_raman, nm_to_eV, eV_to_raman, eV_to_nm
+from CCD.correction import ccd_correct
 
 def load(file_list):
     file = file_list[0]
@@ -18,10 +19,10 @@ def load(file_list):
     q = dades[0,2:]
     y = unique(dades[1:,0])
     x = unique(dades[1:,1])
-    spectra = dades[1:,2:]
+    spectra = dades[1:, 2:]
     
-    dims = len(y), len(x)
-    mida = (x[1]-x[0])*dims[1], (y[1]-y[0])*dims[0]
+    N = len(x), len(y)
+    mida = (x[1]-x[0])*N[0], (y[1]-y[0])*N[1]
 
     xdata = {}
     match units:
@@ -40,4 +41,5 @@ def load(file_list):
             xdata['eV'] = raman_to_eV(q, laser)
             xdata['1/cm'] = q
 
-    return xdata, spectra, mida, dims, laser, units
+    spectra = ccd_correct(xdata['nm'], spectra)
+    return xdata, spectra, N, mida, laser, units

@@ -150,8 +150,9 @@ def load(file_list):
         Z, meta = load_wsxm(file)
 
         Ny, Nx = Z.shape
-        midaX, midaY = get_lateral_size(meta, Nx, Ny)
+        mida = get_lateral_size(meta, Nx, Ny)
+        N = Nx, Ny
 
         channels[tipus] = ChannelData(tipus=tipus, name=tipus, Z=Z, lims=None, mult=True)
     
-    return channels, (Nx, Ny), (midaX, midaY)
+    return channels, N, mida

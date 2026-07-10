@@ -2,6 +2,7 @@ import struct
 import numpy as np
 from classes import ChannelData
 from process.basics import nm_to_raman, nm_to_eV
+from CCD.correction import ccd_correct
 
 # =========================================================
 # BUFFER READER (equivalent a punters en C)
@@ -332,6 +333,12 @@ def load(file_list):
                 xdata = {'nm': d['xdata'], 
                          'eV': nm_to_eV(d['xdata']),
                          '1/cm': nm_to_raman(d['xdata'], d['laser'])}
-                return xdata, d['spectra'], mida, N[::-1], d['laser'], d['units']['z']
+
+                spectra = d['spectra'].copy()
+                spectra = ccd_correct(xdata['nm'], spectra)
+                laser = d['laser']
+                units = d['units']['z']
+
+                return xdata, spectra, N, mida, laser, units
 
     return channels, N, mida
