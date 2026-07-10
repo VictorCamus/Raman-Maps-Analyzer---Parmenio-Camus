@@ -14,10 +14,11 @@ class FileData: # Crea pestanyes per a cada fitxer o mapa o canal.
     folder: str
     name: str
     channel: Dict[str, "ChannelData"]
-    N: Tuple[int]
+    N: Tuple[int, int]
     _midaBase: Tuple[float, float]
     rotation: int = field(default=0, repr=False)  # intern
-    
+    flip: bool = False
+
     def __post_init__(self):
         # 1. Crea les pestanyes per a cada canal del fitxer.
         for chKey, ch in self.channel.items():
