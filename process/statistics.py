@@ -1,10 +1,7 @@
 import numpy as np
 import pandas as pd
-import sys
 from matplotlib.ticker import AutoLocator, ScalarFormatter
 from process.basics import truncar_significatives
-sys.path.insert(1, r'C:\Users\Parmenio\OneDrive - Universitat de Valencia\Escritorio\Doctorat\Programetes\Funcions')
-sys.path.insert(1, r'C:\Users\ASUS\OneDrive - Universitat de València\Escritorio\Doctorat\Programetes\Funcions')
 
 def guardar_histograma(fig, ax, z, lims, carpeta, name, title=None, nbins=100, weight=False, nom=None):
     if name != 'GRAIN': basePath = carpeta / f'Histogrames - {name}'
