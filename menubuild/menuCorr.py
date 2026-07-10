@@ -44,12 +44,12 @@ class RescaleMaps(BaseMapWindow):
 
         self.z = np.copy(ch.Z)
         match opt:  
-            case "sum": self.z += value; self.lims = ch.lims[0]+value, ch.lims[1]+value
-            case "mult": self.z *= value; self.lims = ch.lims[0]*value, ch.lims[1]*value
+            case "sum": self.z += value; self.lims = [ch.lims[0]+value, ch.lims[1]+value]
+            case "mult": self.z *= value; self.lims = [ch.lims[0]*value, ch.lims[1]*value]
             case "norm":
                 zMin, zMax = self.z.min(), self.z.max()
                 self.z = (self.z-zMin)/(zMax-zMin)
-                self.lims = (0, 1)
+                self.lims = [0, 1]
         
         self.update_fig(ch)
 

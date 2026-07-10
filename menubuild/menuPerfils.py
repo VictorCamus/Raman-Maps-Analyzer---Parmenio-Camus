@@ -54,15 +54,12 @@ class GestorPerfils(BaseMenu):  # Classe que gestiona les accions relacionades a
                 messagebox.showwarning("Atenció", f"El fitxer '{f.name}' té una mida diferent i no es poden propagar els perfils.")
                 continue
             
-            f.get_line = file.get_line
-            f.get_length = file.get_length
-            f.get_arrowlims = file.get_arrowlims
-            f.fletxa = {}
+            f.get_line = file.get_line.copy()
+            f.get_length = file.get_length.copy()
+            f.get_arrowlims = file.get_arrowlims.copy()
 
-            for num in file.get_line:
-                f.fletxa[num] = FletxaEstatica(
-                f.axis, f.get_arrowlims[num],
-                f.midaBase, num+1, self.color[num % 8])
+            f.fletxa = {num: FletxaEstatica(f.axis, f.get_arrowlims[num],f.midaBase, num+1, self.color[num % 8])
+                        for num in file.get_line}
 
     def _afegir_perfils(self): # Afegeix un perfil de fletxa a la pestanya actual.
                 

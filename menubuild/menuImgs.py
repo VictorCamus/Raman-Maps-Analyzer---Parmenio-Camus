@@ -1,3 +1,5 @@
+from operator import xor
+
 import numpy as np
 from process import perfil as prf
 
@@ -9,13 +11,12 @@ class GestorImatges(BaseMenu): # Classe que gestiona les accions relacionades am
     
     def __init__(self, app, get_current, set_current):
         super().__init__(app, get_current, set_current)
-
-        self.p1 = {}; self.p2 = {}
         
     def registrar_menu(self, menu):
         accions = [
-            ("Rotar en sentit horari", lambda: self._rotar(k = 1), "<Shift-R>"),
-            ("Rotar en sentit antihorari", lambda: self._rotar(k = -1), "<Shift-L>"),
+            ("Rotar en sentit horari", lambda: self._rotar(rot = 1), "<Shift-R>"),
+            ("Rotar en sentit antihorari", lambda: self._rotar(rot = 3), "<Shift-L>"),
+            ("Voltejar imatge", lambda: self._rotar(flip = True), "<Shift-F>"),
             ("Sincronitzar rotació", lambda: self._rot_sync(), None),
             ("Zoom manual", lambda: self._zoom_manual(), None),
             ("Sincronitzar zoom", lambda: self._zoom_sync(), None),
@@ -25,79 +26,69 @@ class GestorImatges(BaseMenu): # Classe que gestiona les accions relacionades am
         
         self.create_menu("Operacions bàsiques", menu, accions)
         
-    def _rotar(self, new_rot=0, k=0, file=None):
+    def _rotar(self, rot=0, flip = False, file=None):
         if not self.comprova_fitxer(): return
         if not file: file = self.current_file
         channel = file.current_channel
-        
         # --- Normalitzar rotació ---
-        if k != 0: new_rot = (file.rot + k) % 4
-        rot = (new_rot - file.rot) % 4
-        file.rot = new_rot
-        if rot == 0: return  # No cal fer res
+
+        file.rot += rot if not file.flip else -rot # Si està rotada, la rotació resta, si no, suma.
+        if flip: file.flip = not file.flip
 
         # --- Rotar canals ---
-        for ch in file.channel.values(): ch.Z = np.rot90(ch.Z, k=rot)
+        for ch in file.channel.values():
+            if rot != 0: ch.Z = np.rot90(ch.Z, k=rot)
+            if flip: ch.Z = np.flip(ch.Z, axis = 1)
 
         file.image.set_data(channel.Z)
-        self._actualitzar_rotacio(file, rot)
+        self._actualitzar_rotacio(file, rot, flip)
 
-    def _rotar_limits(self, xlims, ylims, Lx, Ly, rotation):
+    def _rotar_limits(self, xlims, ylims, Lx, Ly, rotation, flip):
         match rotation:
-            case 0: return xlims, ylims # 0º
-            case 1: return (ylims,(Lx - xlims[1], Lx - xlims[0])) # 90º
-            case 2: return ((Lx - xlims[1], Lx - xlims[0]), (Ly - ylims[1], Ly - ylims[0])) # 180º
-            case 3: return ((Ly - ylims[1], Ly - ylims[0]), xlims) # 270º
+            case 0: xnew, ynew = xlims, ylims
+            case 1: xnew, ynew = ylims, (Ly - xlims[1], Ly - xlims[0])
+            case 2: xnew, ynew = (Lx - xlims[1], Lx - xlims[0]), (Ly - ylims[1], Ly - ylims[0])
+            case 3: xnew, ynew = (Lx - ylims[1], Lx - ylims[0]), xlims
 
-    def _perfils_rotacio(self, file, rotation):
+        if flip: xnew = (Lx - xnew[1], Lx - xnew[0])
+
+        return xnew, ynew
+
+    def _perfils_rotacio(self, file, rotation, flip):
         Nx, Ny = file.N
         
-        for num in range(len(file.get_line)):
-            p1 = file.get_line[num][0]
-            p2 = file.get_line[num][-1]
+        for num, (line, fletxa) in enumerate(zip(file.get_line.values(), file.fletxa.values())):
+            p1, p2 = line[0], line[-1]
             
             match rotation:
-                case 0: return
-                case 1:
-                    self.p1[num] = [p1[1], Nx - p1[0]]
-                    self.p2[num] = [p2[1], Nx - p2[0]]
-                case 2:
-                    self.p1[num] = [p1[1], p1[0]]
-                    self.p2[num] = [p2[1], p2[0]]                    
-                case 3:
-                    self.p1[num] = [Ny - p1[1], p1[0]]
-                    self.p2[num] = [Ny - p2[1], p2[0]]
-            
-            file.get_line[num] = prf.get_line(self.p1[num], self.p2[num])
+                case 0: pass
+                case 1: p1, p2 = [p1[1], Ny - p1[0]], [p2[1], Ny - p2[0]]
+                case 2: p1, p2 = [Nx - p1[0], Ny - p1[1]], [Nx - p2[0], Ny - p2[1]]
+                case 3: p1, p2 = [Nx - p1[1], p1[0]], [Nx - p2[1], p2[0]]
 
-    def _actualitzar_rotacio(self, file, rot):
-        if hasattr(file, 'mask'):
-            file.mask = np.rot90(file.mask, rotation=rot)
-            file.mask.set_data(file.mask)
-        if hasattr(file, 'get_line'): self._perfils_rotacio(file, rotation=rot)
+            if flip: p1, p2 = [Nx - p1[0], p1[1]], [Nx - p2[0], p2[1]]
+            file.get_line[num] = prf.get_line(p1, p2)
 
-        new_midaX, new_midaY = file.midaBase  # Ja intercanviats en _rotar
+            fletxa.elimina()
+            fletxa.start = [p1[0] * file.midaBase[0] / file.N[0], p1[1] * file.midaBase[1] / file.N[1]]
+            fletxa.end = [p2[0] * file.midaBase[0] / file.N[0], p2[1] * file.midaBase[1] / file.N[1]]
+            file.get_arrowlims[num] = fletxa.start, fletxa.end
+            fletxa.dibuixa()
 
-        if hasattr(file, 'fletxa'):
-            num = 0
-            for fletxa in file.fletxa.values():
-                fletxa.elimina()
-                # Utilitza les coordenades actualitzades de p1 i p2
-                start = [self.p1[num][0] * new_midaY / file.N[1], self.p1[num][1] * new_midaX / file.N[0]]
-                end = [self.p2[num][0] * new_midaY / file.N[1], self.p2[num][1] * new_midaX / file.N[0]]
-                fletxa.start = start
-                fletxa.end = end
-                fletxa.dibuixa()
-                num += 1     
-
-        file.zoom.xylims = self._rotar_limits(*file.zoom.xylims, *file.midaBase, rot)
-        
-        if rot % 2 == 1:
+    def _actualitzar_rotacio(self, file, rot, flip):
+        if rot % 2:
             file.midaBase = file.midaBase[::-1]
-            file.N = file.N[::-1]   
-        
+            file.N = file.N[::-1]
+
+        if hasattr(file, 'mask'):
+            if rot: file.mask = np.rot90(file.mask, k=rot)
+            if flip: file.mask = np.flip(file.mask, axis = 1)
+            file.mask.set_data(file.mask)
+
+        file.zoom.xylims = self._rotar_limits(*file.zoom.xylims, *file.midaBase, rot, flip)
         file.image.set_extent([0, file.midaBase[0], 0, file.midaBase[1]])
 
+        if hasattr(file, 'get_line'): self._perfils_rotacio(file, rotation=rot, flip = flip)
         if file.zoom.mida[0] != file.zoom.mida[1]: file.zoom._resize()
 
     def _rot_sync(self):
@@ -106,7 +97,9 @@ class GestorImatges(BaseMenu): # Classe que gestiona les accions relacionades am
 
         for f in self.files.values():
             if f is not file:
-                self._rotar(new_rot=file.rot, file=f)
+                flip = xor(file.flip, f.flip)
+                rot = (file.rot - f.rot) % 4 if not f.flip else - (file.rot - f.rot) % 4
+                self._rotar(rot = rot, flip = flip, file=f)
 
     def _zoom_manual(self):
         
