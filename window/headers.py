@@ -103,7 +103,6 @@ class CrearCapçalera:
         self._editar_limits()
         self._color_mapa_escala()
 
-      
     def _color_mapa_escala(self): # Afegeix controls per canviar el color del mapa i de l'escala.
         def _grid_color():
             return [
