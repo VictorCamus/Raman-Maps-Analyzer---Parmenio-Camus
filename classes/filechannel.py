@@ -4,7 +4,7 @@ from tkinter.ttk import Frame
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from process import images as zoom
 from drawing import mapdraw as map
-from window.gestor_capçalera import GestorCapçalera
+from window.headers import GestorHeaderAFM
 import classes.diccionaris as dicc
 
 @dataclass 
@@ -34,7 +34,7 @@ class FileData: # Crea pestanyes per a cada fitxer o mapa o canal.
         self.escala = map.Escala(self.axis)
         
         # 3. Crea la capçalera amb les dades del fitxer.
-        self.capçalera = GestorCapçalera(self)
+        self.capçalera = GestorHeaderAFM(self)
         
         # 4. Canvas Tkinter
         self.connect_interaction()

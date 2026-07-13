@@ -5,12 +5,14 @@ from scipy.signal import find_peaks, peak_widths
 from math import floor, ceil  
 from tkinter import filedialog
 from pathlib import Path
-from process.basics import find_nearest
 from process.mathfuncs import FuncParams, linear_combination
 from dataclasses import dataclass
 from fileio.adapters import open_file
-from lmfit import Parameters, minimize, fit_report
+from lmfit import Parameters, minimize
 from time import perf_counter
+from drawing.plots import base_plot
+from process.basics import find_nearest
+from window.builder import BaseFigureWindow
 
 @dataclass
 class Ajust:
@@ -183,6 +185,16 @@ def fit_function(file, fits, fonsSplineGlobal=False):
 
     print("Finalitzat correctament")
 
+class FitSpec(BaseFigureWindow):
+    def __init__(self, gestor, xdata, ydata):
+        self.fig, self.ax = base_plot()
+        self.x = xdata
+        self.y = ydata
+
+        self.plot = self.ax.plot(self.x, self.y, color = 'r')
+        self.fig.canvas.draw()
+        plt.show()
+
 if __name__ == '__main__':
     params = Parameters()
 
@@ -191,7 +203,6 @@ if __name__ == '__main__':
     params.add('LE_A', value=500, min=10)
 
     # Pic 2
-
     params.add("FE_x0", value = 2.38, min = 2.37, max = 2.42)
     params.add("Delta", value=0.23, min=0.18, max=0.3)
     params.add('LE_x0', expr="FE_x0 - Delta")
