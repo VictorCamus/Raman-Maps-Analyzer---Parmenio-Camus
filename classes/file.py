@@ -107,7 +107,8 @@ class FileData: # Crea pestanyes per a cada fitxer o mapa o canal.
 
     @property
     def limit_pixels(self):
-        coord0, coord1 = coords_to_pixel((self.zoom.xlims, self.zoom.ylims), self.N, self.midaBase)
+        coords = [(self.zoom.xlims[0], self.zoom.ylims[0]), (self.zoom.xlims[1], self.zoom.ylims[1])]
+        coord0, coord1 = coords_to_pixel(coords, self.N, self.midaBase)
         x0, y0 = coord0; x1, y1 = coord1
 
         return x0, x1, y0, y1

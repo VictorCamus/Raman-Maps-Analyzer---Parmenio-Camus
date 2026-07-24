@@ -1,3 +1,4 @@
-arrows: - 
+arrows: -
+colormap: -
 mapdraw: - 
 plots: - 

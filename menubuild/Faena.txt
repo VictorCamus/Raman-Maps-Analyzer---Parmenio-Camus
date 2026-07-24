@@ -1,5 +1,5 @@
 base: - 
-register: - Fer que les etiquetes del menú s'adapten a l'estil general.
+register: -
 menuArxiu: -
 menuCorr: 
 	- Afegir extres d'anàlisi: eliminar cicatrius, enganxons...

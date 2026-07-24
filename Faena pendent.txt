@@ -1,4 +1,4 @@
-classes: diccionaris
+classes: -
 drawing: -
 fileio: wsxm
 menubuild: register, menuCorr, menuMaps, menuMask
@@ -12,3 +12,16 @@ Aplicació (WSxM single):
 Revisió general:
 	- Reordenar com siga més lògic.
 	- Mida diferent de les figures on el frame no ha sigut obert prèviament.
+
+FAENA AGOST:
+
+- Fer que les pestanyes puguen arrossegar-se i seguisquen eixe ordre a l'hora de fer operacions.
+- Solucionar error que fa que les finestres flotants siguen massa grans.
+- Fer que la mida actual (zoom) es guarde en els fitxers h5, hdf5.
+- Adaptar el programa MapSpec al WSxM:
+
+    · Frame per als espectres.
+    · Capçalera per als espectres.
+    · Comboboxes o pestanyes per als canals de fits.
+    · Operacions entre canals.
+    · Càlcul d'ajustos.

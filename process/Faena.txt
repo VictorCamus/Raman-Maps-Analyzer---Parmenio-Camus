@@ -1,8 +1,10 @@
 
 basics: -
+converter: -
 flatten: -
-movezoom: -
-perfil: -
+images: -
+mathfuncs: -
 shiftphase: -
 statistics: -
 smooth: - Revisar savitsky_golay_piecewise amb ChatGPT.
+statistics: -
